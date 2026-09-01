@@ -1,14 +1,15 @@
 package com.TicketBooking.demo.show;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
 @Table(name = "show_event")
+@Getter
+@Setter
 public class Show {
 
     @Id
@@ -21,30 +22,8 @@ public class Show {
     @Column(name = "created_at", nullable = false)
     private Instant createdTime;
 
-    public Instant getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(Instant createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    public Instant getStartTime() {
-        return startTime;
-    }
-    public void setStartTime(Instant startTime) {
-        this.startTime = startTime;
-    }
-    public UUID getShowId() {
-        return showId;
-    }
-    public void setShowId(UUID showId) {
-        this.showId = showId;
-    }
-    public String getShowName() {
-        return showName;
-    }
-    public void setShowName(String showName) {
-        this.showName = showName;
+    @PrePersist
+    void onCreate(){
+        this.createdTime = Instant.now();
     }
 }
