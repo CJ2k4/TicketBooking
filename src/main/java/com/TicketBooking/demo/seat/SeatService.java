@@ -28,7 +28,8 @@ public class SeatService {
             throw new ShowNotFoundException(showId);
         }
         List<Seat> seats = seatRepository.findByShowIdOrderByRowLabelAscSeatNumberAsc(showId);
-        Set<UUID> busySeatIds = bookingRepository.findByShowIdAndStatusIn(showId, BookingStatus.ACTIVE).stream().map(Booking::getSeatId).collect(Collectors.toSet());
+        List<Booking> activeBookings = bookingRepository.findByShowIdAndStatusIn(showId, BookingStatus.ACTIVE);
+        Set<UUID> busySeatIds = activeBookings.stream().map(Booking::getSeatId).collect(Collectors.toSet());
         return mapToSeatResponse(seats, busySeatIds);
     }
 

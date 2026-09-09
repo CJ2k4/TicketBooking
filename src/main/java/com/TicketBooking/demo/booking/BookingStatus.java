@@ -7,7 +7,7 @@ public enum BookingStatus {
     CONFIRMED,
     EXPIRED,
     CANCELLED;
-    public static final List<BookingStatus> ACTIVE = List.of(BookingStatus.HELD, BookingStatus.CONFIRMED);
+    public static final Set<BookingStatus> ACTIVE = Set.of(BookingStatus.HELD, BookingStatus.CONFIRMED);
 
     public boolean isActive(){
         return ACTIVE.contains(this);

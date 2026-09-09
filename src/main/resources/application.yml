@@ -19,7 +19,7 @@ spring:
   flyway:
     enabled: true
 
-#booking:
-#  hold-duration: PT5M
-#  max-seats-per-hold: 6
+booking:
+  hold-duration: PT5M
+  max-seats-per-hold: 6
 #  sweeper-interval-ms: 30000

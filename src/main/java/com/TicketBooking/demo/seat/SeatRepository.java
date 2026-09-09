@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface SeatRepository extends JpaRepository<Seat, UUID> {
 
     List<Seat> findByShowIdOrderByRowLabelAscSeatNumberAsc(UUID showId);
+
+    List<Seat> findByShowIdAndIdIn(UUID showId, List<UUID> seatIds);
 }

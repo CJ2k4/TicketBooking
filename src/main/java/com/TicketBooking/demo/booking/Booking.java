@@ -41,7 +41,7 @@ public class Booking {
     private String bookingReference;
 
     @Version
-    private long version;
+    private Long version;
 
     @Column(name = "created_at", nullable = false, updatable= false)
     private Instant createdAt;
