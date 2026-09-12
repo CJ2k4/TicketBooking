@@ -3,7 +3,7 @@ package com.TicketBooking.demo.seat;
 import com.TicketBooking.demo.booking.Booking;
 import com.TicketBooking.demo.booking.BookingRepository;
 import com.TicketBooking.demo.booking.BookingStatus;
-import com.TicketBooking.demo.show.ShowNotFoundException;
+import com.TicketBooking.demo.common.ShowNotFoundException;
 import com.TicketBooking.demo.show.ShowRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

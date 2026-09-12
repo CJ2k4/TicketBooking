@@ -1,15 +1,18 @@
 package com.TicketBooking.demo.booking;
 
+import com.TicketBooking.demo.booking.dto.ConfirmRequest;
+import com.TicketBooking.demo.booking.dto.ConfirmResponse;
 import com.TicketBooking.demo.booking.dto.HoldRequest;
 import com.TicketBooking.demo.booking.dto.HoldResponse;
+import com.TicketBooking.demo.common.*;
 import com.TicketBooking.demo.seat.Seat;
 import com.TicketBooking.demo.seat.SeatRepository;
-import com.TicketBooking.demo.show.ShowNotFoundException;
 import com.TicketBooking.demo.show.ShowRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,6 +25,9 @@ public class BookingService {
     private final SeatRepository seatRepository;
     private final BookingProperties bookingProperties;
     private final BookingRepository bookingRepository;
+    private static final String ALPHABET ="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+    private static final int LENGTH = 8;
+    private static final SecureRandom random = new SecureRandom();
 
     BookingService(ShowRepository showRepository, SeatRepository seatRepository, BookingRepository bookingRepository,  BookingProperties bookingProperties) {
         this.showRepository = showRepository;
@@ -74,6 +80,49 @@ public class BookingService {
             throw new SeatUnavailableException();
         }
         return new HoldResponse(holdId, expiresAt, seatIds);
+    }
+
+
+    @Transactional
+    public ConfirmResponse confirm(UUID holdId, ConfirmRequest confirmRequest) {
+        UUID userId = confirmRequest.userId();
+        List<Booking> bookings  = bookingRepository.findByHoldIdOrderBySeatIdAsc(holdId);
+        if(bookings.isEmpty() || !bookings.getFirst().getUserId().equals(userId)){
+            throw new NotFoundException("Hold not found");
+        }
+        Instant currentTime = Instant.now();
+        for(Booking b : bookings){
+            if(!b.getStatus().equals(BookingStatus.HELD)){
+                throw new HoldNotConfirmableException("Hold is not in HELD state:" +  b.getStatus());
+            }
+            if(b.getHoldExpiresAt().isBefore(currentTime)){
+                throw new HoldExpiredException("Hold Time Expired");
+            }
+        }
+
+        String reference = generateCode();
+
+        List<UUID> seatIds = new ArrayList<>();
+        for(Booking b : bookings){
+            seatIds.add(b.getSeatId());
+            b.setBookingReference(reference);
+            b.setConfirmedAt(currentTime);
+            b.setStatus(BookingStatus.CONFIRMED);
+        }
+
+        bookingRepository.saveAll(bookings);
+        return new ConfirmResponse(reference, currentTime, seatIds);
+
+    }
+
+    private static String generateCode(){
+
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i<LENGTH; i++){
+            int ind = random.nextInt(ALPHABET.length());
+            sb.append(ALPHABET.charAt(ind));
+        }
+        return sb.toString();
     }
 
 }
